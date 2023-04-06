@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Admin App</string>
+    <string name="admin_streaming">Welcome to Admin panel!</string>
+    <string name="select_testimony">Select Testimony</string>
+    <string name="testimony_uploading">Testimony is uploading..</string>
+    <string name="watch_it">Watch It!</string>
+</resources>
