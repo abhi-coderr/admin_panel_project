@@ -47,16 +47,15 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_20ssp"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="@dimen/_20sdp"
             android:background="@drawable/select_btn_back"
             android:padding="@dimen/_10sdp"
-            android:hint="@string/detail_of_this_testimony"
+            android:hint="@string/give_a_name"
             android:textAlignment="textStart"
             android:textColor="@color/white"
             android:textSize="@dimen/_15ssp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.509"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
@@ -71,7 +70,7 @@
             android:background="@drawable/select_btn_back"
             app:layout_constraintTop_toBottomOf="@id/testimony_detail"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_20sdp"
             />
 
         <TextView
@@ -79,7 +78,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_50ssp"
-            android:layout_marginTop="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_20sdp"
             android:background="@drawable/select_btn_back"
             android:padding="@dimen/_10sdp"
             android:text="@string/upload"
@@ -89,14 +88,17 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/upload_ui_cl"
             app:layout_constraintTop_toBottomOf="@id/testimonyCategory" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/upload_ui_cl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_20sdp"
-            android:layout_marginVertical="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_20sdp"
             android:background="@drawable/curved_white_back"
+            app:layout_constraintTop_toBottomOf="@id/video_upload_btn"
             android:padding="@dimen/_15sdp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -106,7 +108,7 @@
                 android:id="@+id/file_status"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/testimony_uploading"
+                android:text="@string/testimony_ready"
                 android:textColor="#0A6C9D"
                 android:textStyle="bold"
                 android:textSize="@dimen/_15ssp"
@@ -168,7 +170,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/holo_blue_dark"
                     android:layout_weight="1"
-                    android:text="40/100mb"
+                    android:text="@string/_0_0mb"
                     />
                 <TextView
                     android:id="@+id/percentage_counter"
@@ -176,7 +178,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textColor="@android:color/holo_blue_dark"
-                    android:text="40%"
+                    android:text="@string/_0"
                     android:textAlignment="textEnd"
                     />
             </LinearLayout>

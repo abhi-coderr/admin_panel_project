@@ -18,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.core.view.isVisible
 import com.example.adminapp.databinding.ActivityUploadTestimonyBinding
 import com.example.adminapp.network.model.Testimony
 import com.example.adminapp.network.model.intent.TestimonyUrl
@@ -163,24 +164,30 @@ class UploadTestimonyActivity : AppCompatActivity() {
     private fun getDataFromIntent() {
         intent?.let {
             testimonyUrl = it.parcelable(Const.INTENT_TESTIMONY_URL)!!
-            Toast.makeText(this, testimonyUrl.testimonyUrl, Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, testimonyUrl.testimonyUrl, Toast.LENGTH_SHORT).show()
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setUpBinding() {
 
         setCategory()
 
         binding.videoUploadBtn.setOnClickListener {
 //            uploadFileToFirebase()
-            abhi()
+            uploadTestimonyToFirebase()
+
         }
 
         binding.pauseBtn.setOnClickListener {
+            uploadTask.pause()
             Toast.makeText(this, "pause", Toast.LENGTH_SHORT).show()
         }
 
         binding.cancelBtn.setOnClickListener {
+            uploadTask.cancel()
+            binding.progressBarUpload.progress = 0
+            onBackPressed()
             Toast.makeText(this, "cancel", Toast.LENGTH_SHORT).show()
         }
     }
@@ -198,11 +205,11 @@ class UploadTestimonyActivity : AppCompatActivity() {
                 parent: AdapterView<*>,
                 view: View, position: Int, id: Long
             ) {
-                Toast.makeText(
-                    this@UploadTestimonyActivity,
-                    testimonyCategoryList[position],
-                    Toast.LENGTH_SHORT
-                ).show()
+//                Toast.makeText(
+//                    this@UploadTestimonyActivity,
+//                    testimonyCategoryList[position],
+//                    Toast.LENGTH_SHORT
+//                ).show()
                 testimonyCategoryText = testimonyCategoryList[position]
             }
 
@@ -219,8 +226,9 @@ class UploadTestimonyActivity : AppCompatActivity() {
         return mimeTypeMap.getExtensionFromMimeType(r.getType(videouri))
     }
 
-    fun abhi() {
-        if (testimonyUrl.testimonyUrl.isNotEmpty() && testimonyCategoryText != "Select Category") {
+    @SuppressLint("SetTextI18n")
+    fun uploadTestimonyToFirebase() {
+        if (testimonyUrl.testimonyUrl.isNotEmpty() && testimonyCategoryText != "Select Category" && binding.testimonyDetail.text.isNotEmpty()) {
 
             val videouri = testimonyUrl.testimonyUrl.toUri()
 
@@ -231,7 +239,7 @@ class UploadTestimonyActivity : AppCompatActivity() {
                         videouri
                     )
                 )
-            reference.putFile(videouri).addOnSuccessListener { taskSnapshot ->
+            uploadTask = reference.putFile(videouri).addOnSuccessListener { taskSnapshot ->
                 val uriTask: Task<Uri> = taskSnapshot.storage.downloadUrl
                 while (!uriTask.isSuccessful);
                 // get the link of video
@@ -247,8 +255,17 @@ class UploadTestimonyActivity : AppCompatActivity() {
                 reference1.child("" + System.currentTimeMillis()).setValue(testimony)
                 // Video uploaded successfully
                 // Dismiss dialog
-                Toast.makeText(this@UploadTestimonyActivity, "Video Uploaded!!", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(
+                    this@UploadTestimonyActivity,
+                    "Testimony Uploaded",
+                    Toast.LENGTH_SHORT
+                ).show()
+                binding.videoUploadBtn.isVisible = false
+                binding.progressBarUpload.progress = 0
+                binding.pauseBtn.isEnabled = false
+                binding.cancelBtn.isEnabled = false
+                binding.fileStatus.text = "Testimony is Uploaded"
+
             }.addOnFailureListener { e -> // Error, Image not uploaded
                 Toast.makeText(
                     this@UploadTestimonyActivity,
@@ -262,6 +279,15 @@ class UploadTestimonyActivity : AppCompatActivity() {
                 val progress =
                     100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
                 binding.progressBarUpload.progress = progress.toInt()
+
+                val progressText =
+                    "${taskSnapshot.bytesTransferred / (1024 * 1024)} / ${taskSnapshot.totalByteCount / (1024 * 1024)} mb"
+
+                binding.mbCounter.text = progressText.trim()
+
+                binding.percentageCounter.text = "${progress.toInt()} %"
+
+
             }
         } else {
             Toast.makeText(this, "Kindly give name and category", Toast.LENGTH_SHORT).show()

@@ -63,6 +63,11 @@ class TestimonySelectorActivity : AppCompatActivity() {
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        videoUri = null
+    }
+
     private fun setUpBinding() = activityBinding.apply {
 
         videoSelectorBtn.setOnClickListener {

@@ -2,7 +2,8 @@
     <string name="app_name">Admin App</string>
     <string name="admin_streaming">Welcome to Admin panel!</string>
     <string name="select_testimony">Select Testimony</string>
-    <string name="testimony_uploading">Testimony is uploading..</string>
+    <string name="testimony_ready">Testimony is Ready</string>
+    <string name="testimony_uploading">Testimony is Uploading..</string>
     <string name="watch_it">Watch It!</string>
     <string name="streaming_panel">Streaming Panel</string>
     <string name="filename_type">filename.type</string>
@@ -10,6 +11,9 @@
     <string name="detail_of_this_testimony">Detail of this testimony</string>
     <string name="upload_testimony">Upload Testimony</string>
     <string name="upload">Upload</string>
+    <string name="_0_0mb">0/0mb</string>
+    <string name="_0">0%</string>
+    <string name="give_a_name">Give a name</string>
 
     <string-array name="Languages">
         <item>Java</item>
