@@ -19,10 +19,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import com.example.adminapp.databinding.ActivityTestimonySelectorBinding
 import com.example.adminapp.databinding.BottomSheetExoplayerBinding
-import com.example.adminapp.utils.Const
+import com.example.adminapp.network.model.intent.TestimonyUrl
+import com.example.adminapp.utils.Const.INTENT_TESTIMONY_URL
+import com.example.adminapp.utils.Const.VIDEO_PICK_CAMERA_CODE
+import com.example.adminapp.utils.Const.VIDEO_PICK_GALLERY_CODE
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 
@@ -81,7 +83,15 @@ class TestimonySelectorActivity : AppCompatActivity() {
 
         nextPage.setOnClickListener {
             if (videoUri != null) {
-                startActivity(Intent(this@TestimonySelectorActivity, MainActivity::class.java))
+                //Navigating for verifying OTP
+                startActivity(Intent(this@TestimonySelectorActivity, UploadTestimonyActivity::class.java).apply {
+                    putExtra(
+                        INTENT_TESTIMONY_URL,
+                        TestimonyUrl(
+                            videoUri.toString()
+                        )
+                    )
+                })
             }
         }
     }
@@ -135,12 +145,12 @@ class TestimonySelectorActivity : AppCompatActivity() {
 
                     startActivityForResult(
                         Intent.createChooser(intent, "Choose Testimony"),
-                        Const.VIDEO_PICK_GALLERY_CODE
+                        VIDEO_PICK_GALLERY_CODE
                     )
                 } else {
                     //camera
                     val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
-                    startActivityForResult(intent, Const.VIDEO_PICK_GALLERY_CODE)
+                    startActivityForResult(intent, VIDEO_PICK_GALLERY_CODE)
                 }
             }
             dialog.show()
@@ -186,17 +196,17 @@ class TestimonySelectorActivity : AppCompatActivity() {
 
         if (resultCode == RESULT_OK) {
             //video is picked from camera or gallery
-            if (requestCode == Const.VIDEO_PICK_CAMERA_CODE) {
+            if (requestCode == VIDEO_PICK_CAMERA_CODE) {
                 // pick from camera
                 videoUri = data?.data
 //                setVideoToPlayer()
-                Toast.makeText(this, "video uri --> ${videoUri.toString()}", Toast.LENGTH_SHORT)
+                Toast.makeText(this, "Watch it", Toast.LENGTH_SHORT)
                     .show()
 
-            } else if (requestCode == Const.VIDEO_PICK_GALLERY_CODE) {
+            } else if (requestCode == VIDEO_PICK_GALLERY_CODE) {
                 // pick from gallery
                 videoUri = data?.data
-                Toast.makeText(this, "video uri --> ${videoUri.toString()}", Toast.LENGTH_SHORT)
+                Toast.makeText(this, "Watch it", Toast.LENGTH_SHORT)
                     .show()
             }
         } else {

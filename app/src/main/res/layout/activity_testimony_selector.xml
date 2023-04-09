@@ -28,7 +28,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/_20sdp"
-                    android:text="Admin Stream Panel"
+                    android:text="@string/streaming_panel"
                     android:textAlignment="center"
                     android:textColor="@android:color/holo_blue_dark"
                     android:textSize="@dimen/_18ssp"
@@ -37,6 +37,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.appbar.MaterialToolbar>
