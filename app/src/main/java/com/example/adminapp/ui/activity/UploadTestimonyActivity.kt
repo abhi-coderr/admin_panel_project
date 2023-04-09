@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import android.webkit.MimeTypeMap
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -22,12 +23,10 @@ import com.example.adminapp.network.model.Testimony
 import com.example.adminapp.network.model.intent.TestimonyUrl
 import com.example.adminapp.utils.Const
 import com.example.adminapp.utils.parcelable
+import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.StorageTask
-import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.*
 import java.io.File
 
 
@@ -173,7 +172,8 @@ class UploadTestimonyActivity : AppCompatActivity() {
         setCategory()
 
         binding.videoUploadBtn.setOnClickListener {
-            uploadFileToFirebase()
+//            uploadFileToFirebase()
+            abhi()
         }
 
         binding.pauseBtn.setOnClickListener {
@@ -209,6 +209,62 @@ class UploadTestimonyActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
                 // write code to perform some action
             }
+        }
+    }
+
+    private fun getfiletype(videouri: Uri): String? {
+        val r = contentResolver
+        // get the file type ,in this case its mp4
+        val mimeTypeMap = MimeTypeMap.getSingleton()
+        return mimeTypeMap.getExtensionFromMimeType(r.getType(videouri))
+    }
+
+    fun abhi() {
+        if (testimonyUrl.testimonyUrl.isNotEmpty() && testimonyCategoryText != "Select Category") {
+
+            val videouri = testimonyUrl.testimonyUrl.toUri()
+
+            // save the selected video in Firebase storage
+            val reference = FirebaseStorage.getInstance()
+                .getReference(
+                    "Files/" + binding.testimonyDetail.text.toString().trim() + "." + getfiletype(
+                        videouri
+                    )
+                )
+            reference.putFile(videouri).addOnSuccessListener { taskSnapshot ->
+                val uriTask: Task<Uri> = taskSnapshot.storage.downloadUrl
+                while (!uriTask.isSuccessful);
+                // get the link of video
+                val downloadUri: String = uriTask.result.toString()
+                val reference1 = FirebaseDatabase.getInstance().getReference("Video")
+                val map: HashMap<String, String> = HashMap()
+                map["videolink"] = downloadUri
+                val testimony = Testimony(
+                    testimonyName = binding.testimonyDetail.text.toString(),
+                    testimonyCategory = testimonyCategoryText,
+                    testimonyUrl = downloadUri
+                )
+                reference1.child("" + System.currentTimeMillis()).setValue(testimony)
+                // Video uploaded successfully
+                // Dismiss dialog
+                Toast.makeText(this@UploadTestimonyActivity, "Video Uploaded!!", Toast.LENGTH_SHORT)
+                    .show()
+            }.addOnFailureListener { e -> // Error, Image not uploaded
+                Toast.makeText(
+                    this@UploadTestimonyActivity,
+                    "Failed " + e.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }.addOnProgressListener { taskSnapshot ->
+                // Progress Listener for loading
+                // percentage on the dialog box
+                // show the progress bar
+                val progress =
+                    100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
+                binding.progressBarUpload.progress = progress.toInt()
+            }
+        } else {
+            Toast.makeText(this, "Kindly give name and category", Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -54,7 +54,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
     implementation 'com.google.firebase:firebase-storage:20.1.0'
     implementation 'com.google.firebase:firebase-database:20.1.0'
-    implementation 'com.firebaseui:firebase-ui-firestore:6.2.0'
+//    implementation 'com.firebaseui:firebase-ui-firestore:6.2.0'
+    implementation platform('com.google.firebase:firebase-bom:29.2.1')
 
     //sdp and ssp
     implementation 'com.intuit.sdp:sdp-android:1.1.0'
