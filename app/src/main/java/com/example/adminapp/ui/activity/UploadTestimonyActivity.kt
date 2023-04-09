@@ -230,6 +230,11 @@ class UploadTestimonyActivity : AppCompatActivity() {
     fun uploadTestimonyToFirebase() {
         if (testimonyUrl.testimonyUrl.isNotEmpty() && testimonyCategoryText != "Select Category" && binding.testimonyDetail.text.isNotEmpty()) {
 
+
+            binding.pauseBtn.isEnabled = true
+
+            binding.cancelBtn.isEnabled = true
+
             val videouri = testimonyUrl.testimonyUrl.toUri()
 
             // save the selected video in Firebase storage
