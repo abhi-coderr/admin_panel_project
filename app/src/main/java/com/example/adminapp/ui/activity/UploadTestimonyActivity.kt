@@ -6,6 +6,8 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
@@ -46,6 +48,7 @@ class UploadTestimonyActivity : AppCompatActivity() {
     private var isReadPermissionGranted = false
     private var isWritePermissionGranted = false
     private var isCameraPermissionGranted = false
+    private var isReadVideoPermissionGranted = false
 
     private val testimonyCategoryList = arrayListOf<String>(
         "Select Category",
@@ -73,14 +76,22 @@ class UploadTestimonyActivity : AppCompatActivity() {
         permissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions())
             { permissions ->
-                isReadPermissionGranted = permissions[Manifest.permission.READ_EXTERNAL_STORAGE]
-                    ?: isReadPermissionGranted
+                if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
+                    isReadVideoPermissionGranted = permissions[Manifest.permission.READ_MEDIA_VIDEO]
+                        ?: isReadVideoPermissionGranted
+                } else {
+                    isReadPermissionGranted = permissions[Manifest.permission.READ_EXTERNAL_STORAGE]
+                        ?: isReadPermissionGranted
 
-                isWritePermissionGranted = permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE]
-                    ?: isWritePermissionGranted
+                    isWritePermissionGranted =
+                        permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE]
+                            ?: isWritePermissionGranted
 
-                isCameraPermissionGranted = permissions[Manifest.permission.CAMERA]
-                    ?: isCameraPermissionGranted
+                    isCameraPermissionGranted = permissions[Manifest.permission.CAMERA]
+                        ?: isCameraPermissionGranted
+
+                }
+
             }
 
         storageRef = FirebaseStorage.getInstance().reference.child("videos")
@@ -230,7 +241,6 @@ class UploadTestimonyActivity : AppCompatActivity() {
     fun uploadTestimonyToFirebase() {
         if (testimonyUrl.testimonyUrl.isNotEmpty() && testimonyCategoryText != "Select Category" && binding.testimonyDetail.text.isNotEmpty()) {
 
-
             binding.pauseBtn.isEnabled = true
 
             binding.cancelBtn.isEnabled = true
@@ -300,37 +310,44 @@ class UploadTestimonyActivity : AppCompatActivity() {
     }
 
     private fun requestPermission() {
-        isReadPermissionGranted = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
+        if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
+            isReadVideoPermissionGranted =
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.READ_MEDIA_VIDEO
+                ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            isReadPermissionGranted = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
 
-        isWritePermissionGranted = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
+            isWritePermissionGranted = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
 
-        isCameraPermissionGranted = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
+            isCameraPermissionGranted = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
 
-        val permissionRequestList: MutableList<String> = ArrayList()
+            val permissionRequestList: MutableList<String> = ArrayList()
 
-        if (!isReadPermissionGranted) {
-            permissionRequestList.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            if (!isReadPermissionGranted) {
+                permissionRequestList.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+            if (!isWritePermissionGranted) {
+                permissionRequestList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+            if (!isCameraPermissionGranted) {
+                permissionRequestList.add(Manifest.permission.CAMERA)
+            }
+
+            if (permissionRequestList.isNotEmpty()) {
+                permissionLauncher.launch(permissionRequestList.toTypedArray())
+            }
         }
-        if (!isWritePermissionGranted) {
-            permissionRequestList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        if (!isCameraPermissionGranted) {
-            permissionRequestList.add(Manifest.permission.CAMERA)
-        }
-
-        if (permissionRequestList.isNotEmpty()) {
-            permissionLauncher.launch(permissionRequestList.toTypedArray())
-        }
-
     }
 
 }

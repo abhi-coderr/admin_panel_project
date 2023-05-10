@@ -6,22 +6,22 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/nuga_best_logo"
-        android:roundIcon="@drawable/nuga_best_logo"
         android:label="@string/app_name"
+        android:roundIcon="@drawable/nuga_best_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.AdminApp"
         tools:targetApi="31">
         <activity
             android:name=".ui.activity.SplashActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
-            >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,13 +31,11 @@
         <activity
             android:name=".ui.activity.TestimonySelectorActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.UploadTestimonyActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

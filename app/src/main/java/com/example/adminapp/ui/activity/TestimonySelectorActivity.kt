@@ -13,12 +13,15 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.adminapp.R
 import com.example.adminapp.databinding.ActivityTestimonySelectorBinding
 import com.example.adminapp.databinding.BottomSheetExoplayerBinding
 import com.example.adminapp.network.model.intent.TestimonyUrl
@@ -89,14 +92,18 @@ class TestimonySelectorActivity : AppCompatActivity() {
         nextPage.setOnClickListener {
             if (videoUri != null) {
                 //Navigating for verifying OTP
-                startActivity(Intent(this@TestimonySelectorActivity, UploadTestimonyActivity::class.java).apply {
-                    putExtra(
-                        INTENT_TESTIMONY_URL,
-                        TestimonyUrl(
-                            videoUri.toString()
+                startActivity(
+                    Intent(
+                        this@TestimonySelectorActivity,
+                        UploadTestimonyActivity::class.java
+                    ).apply {
+                        putExtra(
+                            INTENT_TESTIMONY_URL,
+                            TestimonyUrl(
+                                videoUri.toString()
+                            )
                         )
-                    )
-                })
+                    })
             }
         }
     }
