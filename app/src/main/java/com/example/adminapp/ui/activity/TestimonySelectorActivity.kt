@@ -13,15 +13,12 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.adminapp.R
 import com.example.adminapp.databinding.ActivityTestimonySelectorBinding
 import com.example.adminapp.databinding.BottomSheetExoplayerBinding
 import com.example.adminapp.network.model.intent.TestimonyUrl
@@ -38,6 +35,7 @@ class TestimonySelectorActivity : AppCompatActivity() {
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var bottomSheetExoplayer: BottomSheetExoplayerBinding
     private var isReadPermissionGranted = false
+    private var isReadMediaVideo = false
     private var isWritePermissionGranted = false
     private var isCameraPermissionGranted = false
     private var videoUri: Uri? = null
@@ -47,20 +45,46 @@ class TestimonySelectorActivity : AppCompatActivity() {
         activityBinding = ActivityTestimonySelectorBinding.inflate(layoutInflater)
         setContentView(activityBinding.root)
 
-        permissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions())
-            { permissions ->
-                isReadPermissionGranted = permissions[Manifest.permission.READ_EXTERNAL_STORAGE]
-                    ?: isReadPermissionGranted
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher =
+                registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions())
+                { permissions ->
 
-                isWritePermissionGranted = permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE]
-                    ?: isWritePermissionGranted
+                    isReadMediaVideo = permissions[Manifest.permission.READ_MEDIA_VIDEO]
+                        ?: isReadMediaVideo
 
-                isCameraPermissionGranted = permissions[Manifest.permission.CAMERA]
-                    ?: isCameraPermissionGranted
-            }
+                    isReadPermissionGranted = permissions[Manifest.permission.READ_EXTERNAL_STORAGE]
+                        ?: isReadPermissionGranted
 
-        requestPermission()
+                    isWritePermissionGranted =
+                        permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE]
+                            ?: isWritePermissionGranted
+
+                    isCameraPermissionGranted = permissions[Manifest.permission.CAMERA]
+                        ?: isCameraPermissionGranted
+                }
+
+            requestPermission()
+        } else {
+
+            permissionLauncher =
+                registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions())
+                { permissions ->
+
+                    isReadPermissionGranted = permissions[Manifest.permission.READ_EXTERNAL_STORAGE]
+                        ?: isReadPermissionGranted
+
+                    isWritePermissionGranted =
+                        permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE]
+                            ?: isWritePermissionGranted
+
+                    isCameraPermissionGranted = permissions[Manifest.permission.CAMERA]
+                        ?: isCameraPermissionGranted
+                }
+
+            requestPermission()
+
+        }
 
         setUpBinding()
 
@@ -109,64 +133,141 @@ class TestimonySelectorActivity : AppCompatActivity() {
     }
 
     private fun requestPermission() {
-        isReadPermissionGranted = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
-
-        isWritePermissionGranted = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
-
-        isCameraPermissionGranted = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
 
         val permissionRequestList: MutableList<String> = ArrayList()
 
-        if (!isReadPermissionGranted) {
-            permissionRequestList.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-        if (!isWritePermissionGranted) {
-            permissionRequestList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        if (!isCameraPermissionGranted) {
-            permissionRequestList.add(Manifest.permission.CAMERA)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            // only for gingerbread and newer versions
+            isReadMediaVideo = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_MEDIA_VIDEO
+            ) == PackageManager.PERMISSION_GRANTED
+
+            isReadPermissionGranted = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+
+            isWritePermissionGranted = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+
+            isCameraPermissionGranted = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (!isReadMediaVideo) {
+                permissionRequestList.add(Manifest.permission.READ_MEDIA_VIDEO)
+            }
+
+            if (!isReadPermissionGranted) {
+                permissionRequestList.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+            if (!isWritePermissionGranted) {
+                permissionRequestList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+            if (!isCameraPermissionGranted) {
+                permissionRequestList.add(Manifest.permission.CAMERA)
+            }
+
+            if (permissionRequestList.isNotEmpty()) {
+                permissionLauncher.launch(permissionRequestList.toTypedArray())
+            }
+
+
+        } else {
+
+            isReadPermissionGranted = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+
+            isWritePermissionGranted = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+
+            isCameraPermissionGranted = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+
+
+            if (!isReadPermissionGranted) {
+                permissionRequestList.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+            if (!isWritePermissionGranted) {
+                permissionRequestList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+            if (!isCameraPermissionGranted) {
+                permissionRequestList.add(Manifest.permission.CAMERA)
+            }
+
+            if (permissionRequestList.isNotEmpty()) {
+                permissionLauncher.launch(permissionRequestList.toTypedArray())
+            }
+
         }
 
-        if (permissionRequestList.isNotEmpty()) {
-            permissionLauncher.launch(permissionRequestList.toTypedArray())
-        }
 
     }
 
     private fun selectTestimony() {
-        if (isWritePermissionGranted && isReadPermissionGranted && isCameraPermissionGranted) {
-            val options = arrayOf("Gallery", "Camera")
-            // alert dialog
-            val dialog = AlertDialog.Builder(this)
-            dialog.setTitle("Choose Medium").setItems(options) { _, i ->
-                if (i == 0) {
-                    //gallery
-                    //video pick intent gallery
-                    val intent = Intent()
-                    intent.type = "video/*"
-                    intent.action = Intent.ACTION_GET_CONTENT
 
-                    startActivityForResult(
-                        Intent.createChooser(intent, "Choose Testimony"),
-                        VIDEO_PICK_GALLERY_CODE
-                    )
-                } else {
-                    //camera
-                    val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
-                    startActivityForResult(intent, VIDEO_PICK_GALLERY_CODE)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (isCameraPermissionGranted && isReadMediaVideo) {
+                val options = arrayOf("Gallery", "Camera")
+                // alert dialog
+                val dialog = AlertDialog.Builder(this)
+                dialog.setTitle("Choose Medium").setItems(options) { _, i ->
+                    if (i == 0) {
+                        //gallery
+                        //video pick intent gallery
+                        val intent = Intent()
+                        intent.type = "video/*"
+                        intent.action = Intent.ACTION_GET_CONTENT
+
+                        startActivityForResult(
+                            Intent.createChooser(intent, "Choose Testimony"),
+                            VIDEO_PICK_GALLERY_CODE
+                        )
+                    } else {
+                        //camera
+                        val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
+                        startActivityForResult(intent, VIDEO_PICK_GALLERY_CODE)
+                    }
                 }
+                dialog.show()
             }
-            dialog.show()
+        } else {
+            if (isWritePermissionGranted && isReadPermissionGranted && isCameraPermissionGranted) {
+                val options = arrayOf("Gallery", "Camera")
+                // alert dialog
+                val dialog = AlertDialog.Builder(this)
+                dialog.setTitle("Choose Medium").setItems(options) { _, i ->
+                    if (i == 0) {
+                        //gallery
+                        //video pick intent gallery
+                        val intent = Intent()
+                        intent.type = "video/*"
+                        intent.action = Intent.ACTION_GET_CONTENT
+
+                        startActivityForResult(
+                            Intent.createChooser(intent, "Choose Testimony"),
+                            VIDEO_PICK_GALLERY_CODE
+                        )
+                    } else {
+                        //camera
+                        val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
+                        startActivityForResult(intent, VIDEO_PICK_GALLERY_CODE)
+                    }
+                }
+                dialog.show()
+            }
         }
+
     }
 
     private fun setVideoToExoPlayer() {
